@@ -1,13 +1,13 @@
 ---
 name: superpowers-writing-plan-in-plan-mode
-description: Use when the user wants to author a new implementation plan, or review and refine an existing plan, in plan mode before any code is written or executed.
+description: Use when the user wants to author a new implementation plan, or review and refine an existing plan, before any code is written or executed.
 ---
 
 # Writing & Reviewing Plans in Plan Mode
 
 ## Overview
 
-Drive plan authoring and review through **plan mode** with an interactive, comment-driven loop. The plan lives in a `.md` file. The user reviews it section by section; you fold their comments into a working copy. **Approving the plan persists the revised `.md` — it does NOT start implementation.**
+Author and review implementation plans through the IDE's interactive **plan-mode** flow — enter plan mode, iterate with the user, exit to approve. The only twist: plan mode's normal **"exit → execute"** is redefined here to **"exit → write the revised plan to the repo's `.md`"**. Approving the plan persists the document; it never starts implementation.
 
 This skill orchestrates two superpowers sub-skills (`brainstorming`, `writing-plans`) plus a review loop. (Requires the `superpowers` plugin for the sub-skills.)
 
@@ -28,24 +28,27 @@ Decide from the **current conversation context**:
 ## Branch A — New plan
 
 1. **REQUIRED SUB-SKILL:** Use `superpowers:brainstorming` FIRST. Do not write any plan until you've explored intent, requirements, and a design the user approves.
-2. **REQUIRED SUB-SKILL:** Use `superpowers:writing-plans` to decompose into small tasks with file paths and tests-before-code, and write the plan to a `.md` file.
-3. Enter the **Review loop** on that newly written `.md`.
+2. **REQUIRED SUB-SKILL:** Use `superpowers:writing-plans` to decompose into small tasks with file paths and tests-before-code, and write the plan to a `.md` file **in the repo** (the canonical location).
+3. Enter the **Review loop** on that repo `.md`.
 
 ## Branch B — Existing plan
 
-1. Confirm which `.md` (inferred from context per Step 0).
-2. Enter the **Review loop**.
+The plan already exists in the repo, so **skip brainstorming + writing-plans** — there is no creation step.
 
-## The Review loop (4 steps)
+1. Confirm which repo `.md` (inferred from context per Step 0).
+2. Enter the **Review loop** directly.
 
-1. **Enter plan mode** and load the `.md` content as an editable working copy.
-2. The **user comments** — section by section, task by task.
-3. **Incorporate** each comment into the working copy.
-4. **On accept → write the revised version back to the ORIGINAL `.md`, then STOP.**
+## The Review loop (interactive, in plan mode)
 
-## The load-bearing rule: accepting is NOT executing
+The canonical plan lives in the repo `.md`. You review it on an **outside working copy** (in the user's plans folder — the plan-mode file), then write the approved result back to the repo. That separation is what lets plan mode's interactive sandbox edit the working copy while the repo file stays untouched until approval.
 
-When the user "accepts"/"approves" the plan — including casual approval **in any language** (e.g. "ok", "approve", "lgtm", "go ahead", "ship it") — that means **one thing only: write the revised plan to its `.md` file and stop.** It does NOT authorize implementation. No code, no edits to source, no running tests, no migrations.
+1. **Enter plan mode and copy the repo `.md`'s FULL content** into the plan-mode working file (the outside copy, in the user's folder). Load it **verbatim** — no summary, no "map", and don't ask how to set up the copy. This outside copy is what you edit.
+2. The **user comments** — section by section, task by task — and you edit the outside working copy interactively.
+3. **On accept (the user approves / you exit plan mode) → write the working copy back to the repo's ORIGINAL `.md`, then STOP.** Exiting persists the revised plan to the repo; it does **NOT** start implementation.
+
+## The load-bearing rule: exiting persists the plan, it does NOT execute
+
+When the user approves the plan and you exit plan mode — including casual approval **in any language** (e.g. "ok", "approve", "lgtm", "go ahead", "ship it") — that means **one thing only: write the revised plan to the repo's `.md` and stop.** Exiting plan mode here does **NOT** mean "start implementing". No code, no edits to source, no running tests, no migrations.
 
 Code is written only when the user **explicitly asks to implement, in a later, separate turn.**
 
@@ -53,10 +56,10 @@ Code is written only when the user **explicitly asks to implement, in a later, s
 
 | Rationalization | Reality |
 |---|---|
-| "They approved the plan, obviously they want it built now." | Approval = persist the `.md`. Building is a separate request. |
-| "ExitPlanMode normally means start implementing." | Not under this skill. Here it means: the revised plan is ready to be saved. |
-| "It's faster to just start Task 1." | Stop. Save the `.md` and wait. |
-| "They said 'go' / 'ship it' — green light to build." | Approval = save the plan and stop, not code. |
+| "Exiting plan mode means start implementing." | Not here. This skill redefines exit → write the plan to the repo `.md`. |
+| "They approved the plan, obviously they want it built now." | Approval = persist the plan to the repo. Building is a separate request. |
+| "It's faster to just start Task 1." | Stop. Persist the plan to the `.md` and wait. |
+| "They said 'go' / 'ship it' — green light to build." | Approval = persist the plan, not code. |
 
 ## Keep responding in the user's language
 
@@ -64,7 +67,9 @@ Code is written only when the user **explicitly asks to implement, in a later, s
 
 ## Red Flags — STOP
 
-- About to ExitPlanMode and then edit source files / run tests → STOP. Write the `.md` and stop.
+- About to start coding / edit source / run tests / create migrations after exiting plan mode → STOP. Exit = write the plan to the repo `.md`, not execute.
+- About to summarize the plan or make a "map" instead of loading its FULL content → STOP. Load the whole plan as the working copy.
+- About to ask the user how to set up the working copy → don't. Load the full plan into the plan-mode working copy.
 - About to ask "which plan?" when context already makes it obvious → infer + confirm instead.
 - About to draft a new plan without brainstorming first → STOP. Brainstorm first.
 - About to switch to English mid-conversation → keep the user's language.
@@ -74,6 +79,6 @@ Code is written only when the user **explicitly asks to implement, in a later, s
 | User intent | What you do |
 |---|---|
 | "write a plan for X" (new) | `brainstorming` → `writing-plans` → review loop |
-| "review/refine the plan" (existing) | confirm which `.md` → review loop |
-| user approves, in any language ("ok", "lgtm", "approve"…) (in review) | write revised `.md`, then **STOP** (no code) |
+| "review/refine the plan" (existing) | confirm which `.md` → review loop (plan mode, full content) |
+| user approves / you exit plan mode | write the revised plan to the repo `.md`, then **STOP** (no code) |
 | user asks to implement (later, separate turn) | now you may execute |
