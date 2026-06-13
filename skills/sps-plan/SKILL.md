@@ -1,5 +1,5 @@
 ---
-name: plan
+name: sps-plan
 description: Use when the user wants to author a new implementation plan, or review and refine an existing one — interactively, directly on the repo's `.md`, before any code is written or executed.
 ---
 
