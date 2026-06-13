@@ -2,6 +2,9 @@
 .vscode/
 .idea/
 
+# Claude Code local config (the published plugin lives in .claude-plugin/)
+.claude/
+
 # OS
 .DS_Store
 Thumbs.db
