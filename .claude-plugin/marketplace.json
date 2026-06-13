@@ -1,0 +1,18 @@
+{
+  "name": "matias-plugins",
+  "description": "Matias Alvarez Sabate's Claude Code plugins",
+  "owner": {
+    "name": "Matias Alvarez Sabate"
+  },
+  "plugins": [
+    {
+      "name": "superpowers-writing-plan-in-plan-mode",
+      "description": "Author or review implementation plans in plan mode via an interactive, comment-driven loop where approving the plan saves the revised file instead of starting implementation.",
+      "version": "0.1.0",
+      "source": "./",
+      "author": {
+        "name": "Matias Alvarez Sabate"
+      }
+    }
+  ]
+}

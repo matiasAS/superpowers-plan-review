@@ -1,0 +1,20 @@
+{
+  "name": "superpowers-writing-plan-in-plan-mode",
+  "description": "Author or review implementation plans in plan mode via an interactive, comment-driven loop where approving the plan saves the revised file instead of starting implementation.",
+  "version": "0.1.0",
+  "author": {
+    "name": "Matias Alvarez Sabate"
+  },
+  "homepage": "https://github.com/matiasAS/superpowers-writing-plan-in-plan-mode",
+  "repository": "https://github.com/matiasAS/superpowers-writing-plan-in-plan-mode",
+  "license": "MIT",
+  "keywords": [
+    "skills",
+    "plan-mode",
+    "planning",
+    "workflow",
+    "superpowers",
+    "brainstorming",
+    "writing-plans"
+  ]
+}
