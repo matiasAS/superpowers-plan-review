@@ -18,7 +18,7 @@ When you want to write a new plan or refine an existing one, the skill drives a 
 
 ## The core rule: accepting is NOT executing
 
-Approving the plan (even a terse "ok", "dale", "lgtm") means **one thing**: persist the revised `.md` and stop. It does **not** authorize writing code, editing source, running tests, or creating migrations. Implementation happens only when you **explicitly ask for it in a later, separate turn**. This keeps "let's finalize the plan" cleanly separate from "now build it".
+Approving the plan (even a terse "ok", "lgtm", "go ahead", in any language) means **one thing**: persist the revised `.md` and stop. It does **not** authorize writing code, editing source, running tests, or creating migrations. Implementation happens only when you **explicitly ask for it in a later, separate turn**. This keeps "let's finalize the plan" cleanly separate from "now build it".
 
 ## Requirements
 

@@ -15,7 +15,7 @@ This skill orchestrates two superpowers sub-skills (`brainstorming`, `writing-pl
 
 - The user asks to write/draft a new implementation plan for a feature or refactor.
 - The user asks to review, refine, or comment on an existing plan.
-- Trigger phrases: "let's review the plan", "revisemos el plan", "armemos un plan", "write a plan for X".
+- Trigger phrases (in any language): "let's review the plan", "refine the plan", "write a plan for X".
 
 ## Step 0 — New plan or existing plan?
 
@@ -45,7 +45,7 @@ Decide from the **current conversation context**:
 
 ## The load-bearing rule: accepting is NOT executing
 
-When the user "accepts"/"approves" the plan — including casual phrases like "dale", "perfecto, acepto", "ok, hagámoslo", "approve", "lgtm" — that means **one thing only: write the revised plan to its `.md` file and stop.** It does NOT authorize implementation. No code, no edits to source, no running tests, no migrations.
+When the user "accepts"/"approves" the plan — including casual approval **in any language** (e.g. "ok", "approve", "lgtm", "go ahead", "ship it") — that means **one thing only: write the revised plan to its `.md` file and stop.** It does NOT authorize implementation. No code, no edits to source, no running tests, no migrations.
 
 Code is written only when the user **explicitly asks to implement, in a later, separate turn.**
 
@@ -56,7 +56,7 @@ Code is written only when the user **explicitly asks to implement, in a later, s
 | "They approved the plan, obviously they want it built now." | Approval = persist the `.md`. Building is a separate request. |
 | "ExitPlanMode normally means start implementing." | Not under this skill. Here it means: the revised plan is ready to be saved. |
 | "It's faster to just start Task 1." | Stop. Save the `.md` and wait. |
-| "They said 'dale' — that's go." | 'dale' here = save the plan and stop, not code. |
+| "They said 'go' / 'ship it' — green light to build." | Approval = save the plan and stop, not code. |
 
 ## Keep responding in the user's language
 
@@ -75,5 +75,5 @@ Code is written only when the user **explicitly asks to implement, in a later, s
 |---|---|
 | "write a plan for X" (new) | `brainstorming` → `writing-plans` → review loop |
 | "review/refine the plan" (existing) | confirm which `.md` → review loop |
-| "acepto / dale / approve" (in review) | write revised `.md`, then **STOP** (no code) |
+| user approves, in any language ("ok", "lgtm", "approve"…) (in review) | write revised `.md`, then **STOP** (no code) |
 | user asks to implement (later, separate turn) | now you may execute |
