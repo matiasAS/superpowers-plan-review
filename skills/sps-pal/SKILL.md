@@ -9,7 +9,7 @@ description: Use when adversarially reviewing a specific, non-trivial implementa
 
 Apply a **Red Team Consensus** — an adversarial review via the `pal` MCP — to **a specific plan**, BEFORE any code is written. Two evaluators with opposed stances stress-test the plan against the real code under strict evidence rules. When the review finishes, you **apply only the code-verified fixes** to the plan's `.md` and **open the interactive review** so the user keeps refining it with feedback.
 
-(Requires the `pal` MCP server for `consensus` / `chat` / `listmodels`. The "open the interactive review" hand-off is the `sps-plan` skill's existing-plan path.)
+(Requires the `pal` MCP server for `consensus` / `chat` / `listmodels`. "Open the interactive review" hands off to the `sps-plan` skill (existing-plan path), which opens the `.md` in **plan mode** for **"Add Comment"** review.)
 
 ## When to Use
 
@@ -49,7 +49,7 @@ Synthesize the findings, then:
 2. **Run the gates the review suggests** (e.g. a `grep`/LSP enumeration of callers) **for real**, and record the result. Never leave a gate as theory.
 3. **Apply ONLY the verified fixes** to the plan's `.md`.
 4. **Leave a review changelog inside the plan:** what was found, what was applied, what was discarded and why.
-5. **Open the interactive review** of the `.md` (the `sps-plan` skill's existing-plan path) so the user keeps refining with feedback. Do **not** start implementation — the plan is still a plan.
+5. **Hand off to `sps-plan`** (existing-plan path): it opens the `.md` in **plan mode** so the user keeps refining it with **"Add Comment"**. Do **not** start implementation — the plan is still a plan.
 
 ## Operational notes
 

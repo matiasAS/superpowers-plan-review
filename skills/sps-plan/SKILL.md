@@ -1,13 +1,18 @@
 ---
 name: sps-plan
-description: Use when the user wants to author a new implementation plan, or review and refine an existing one — interactively, directly on the repo's `.md`, before any code is written or executed.
+description: Use when the user wants to author a new implementation plan, or review and refine an existing one, in Claude Code's plan mode — the plan is reviewed on the plan file with "Add Comment", and on accept it is written to the repo's .md instead of starting implementation.
 ---
 
-# Writing & Reviewing Implementation Plans
+# Reviewing Implementation Plans in Plan Mode
 
 ## Overview
 
-Author and review an implementation plan through a **direct, interactive review on the repo's `.md` file**: the user comments section by section, you edit the file in place, and each edit is saved as you go. The load-bearing rule: **finishing the review does NOT start implementation** — the plan stays a plan until the user explicitly asks to build it, in a later turn.
+Author and review an implementation plan through Claude Code's interactive **plan mode**. Two files are in play:
+
+- the **plan file** (`~/.claude/plans/<name>.md`) — the working copy plan mode opens in an editor tab; the **only file writable while in plan mode**, and where the user leaves inline **"Add Comment"** feedback;
+- the **repo `.md`** — the canonical, git-versioned plan.
+
+The one twist: **"Accept and exit plan mode" is redefined here to "write the plan to the repo `.md`"** — it never starts implementation.
 
 (Requires the `superpowers` plugin for the `brainstorming` and `writing-plans` sub-skills.)
 
@@ -15,66 +20,71 @@ Author and review an implementation plan through a **direct, interactive review 
 
 - The user asks to write/draft a new implementation plan for a feature or refactor.
 - The user asks to review, refine, or comment on an existing plan.
-- Trigger phrases (in any language): "let's review the plan", "refine the plan", "write a plan for X".
+- Trigger phrases (in any language): "write a plan for X", "let's review the plan", "refine the plan".
 
 ## The flow
 
-Always the same three steps. Only **Step 1** differs, depending on whether the plan already exists.
+### Step 0 — New plan or existing plan?
 
-### Step 0 — Decide: new plan or existing plan?
+Decide from the **current conversation context** — infer, then confirm; don't ask cold, and don't silently assume. Stay within the current context (don't plan an unrelated topic).
 
-Decide from the **current conversation context** — don't ask cold:
+### Step 1 — Enter plan mode and load the plan into the plan file
 
-- If you've been working on a specific feature/topic, the plan is that one. **Infer it, then confirm** — don't ask "which plan?" when context makes it obvious, and don't silently assume either.
-- **Stay within the current context.** If the session is about feature A, don't plan unrelated feature B.
-- Only if genuinely ambiguous, ask with one short AskUserQuestion.
-
-### Step 1 — Get the plan into a repo `.md`
+Enter plan mode (`EnterPlanMode`). Plan mode creates a **plan file** at `~/.claude/plans/<name>.md` and opens it in a tab — it is the **only file you can write** while in plan mode. Get the plan content into that plan file:
 
 - **New plan** (create it):
-  1. **REQUIRED SUB-SKILL** `superpowers:brainstorming` FIRST — explore intent, requirements, and a design the user approves. Write nothing until then.
-  2. **REQUIRED SUB-SKILL** `superpowers:writing-plans` — decompose into small tasks with file paths and tests-before-code, and write the plan to a `.md` file **in the repo**.
-- **Existing plan** (don't create it): it already lives in the repo, so **skip brainstorming + writing-plans** — there is no creation step. Just identify which repo `.md` it is (inferred + confirmed per Step 0).
+  1. **REQUIRED SUB-SKILL** `superpowers:brainstorming` FIRST (*before* entering plan mode) — explore intent, requirements, and a design the user approves.
+  2. **REQUIRED SUB-SKILL** `superpowers:writing-plans`, **with its output pointed at the plan file** (`~/.claude/plans/<name>.md`). Pass that path as the plan location — it overrides writing-plans' default (`docs/superpowers/plans/`). ⚠️ Letting it write the repo default while in plan mode **fails** (only the plan file is writable there).
+- **Existing plan** (don't create it):
+  - Identify which **repo `.md`** it is (inferred + confirmed per Step 0; if genuinely ambiguous, one short AskUserQuestion). **Skip** brainstorming + writing-plans — there is no creation step.
+  - **Copy the repo `.md`'s CURRENT content** into the plan file — the user's live version, with any edits they made; the repo `.md` is the **source of truth**. **Never** reuse a stale plan file from a previous session.
 
-### Step 2 — Review the `.md` interactively
+### Step 2 — Review interactively with "Add Comment"
 
-Review the plan **directly on the repo's `.md`** (normal mode — no plan mode, no separate working copy). The **user comments** — section by section, task by task — and you **edit the `.md` in place**; each edit is saved immediately. Git is the safety net: if the user wants to discard the review, that's a `git checkout` of the file.
+Call `ExitPlanMode` to present the plan. The user reviews it in the plan-file tab and leaves feedback by **selecting text and using "Add Comment"** (anchored to fragments). Those comments come back to you — **apply each one to the plan file**, then present again with `ExitPlanMode`. Loop (present → apply comments → present) as many times as needed until the user is satisfied.
 
-### Step 3 — Finish the review
+### Step 3 — On "Accept and exit plan mode" → write to the repo `.md`
 
-When the user is satisfied / approves (even a terse "ok", "lgtm", "go ahead", in any language): the plan is **already saved** (you edited it in place), so finishing just **ends the review**. It does **NOT** start implementation.
+When the user accepts and exits plan mode: **copy the plan file → the repo `.md`, then STOP.**
 
-## The load-bearing rule: finishing the review does NOT execute
+- New plan → write to the canonical repo location (e.g. `docs/superpowers/plans/<date>-<feature>.md`, or wherever the user keeps plans).
+- Existing plan → write back to the **same** repo `.md` it was loaded from.
 
-When the user approves / says the plan looks good — including casual approval **in any language** (e.g. "ok", "approve", "lgtm", "go ahead", "ship it") — that means **the plan is final, and you stop.** No code, no edits to source, no running tests, no migrations.
+Confirm the file was written. Then **STOP — do NOT implement.**
+
+## The load-bearing rule: accept = write the repo `.md`, NOT execute
+
+When the user accepts / exits plan mode — including casual approval **in any language** (e.g. "ok", "approve", "lgtm", "go ahead", "ship it") — that means **one thing only: copy the plan to the repo `.md` and stop.** No code, no edits to source, no running tests, no migrations.
 
 Code is written only when the user **explicitly asks to implement, in a later, separate turn.**
 
 | Rationalization | Reality |
 |---|---|
-| "The plan looks done, obviously they want it built now." | A finished plan is still just a plan. Building is a separate request. |
-| "They approved the plan — green light to code." | Approval = the plan is final. It is NOT authorization to implement. |
-| "It's faster to just start Task 1." | Stop. The review is over; wait for an explicit build request. |
-| "They said 'go' / 'ship it'." | That ends the review, it does not start the build. |
+| "Accept and exit plan mode means start implementing." | Not here. This skill redefines accept → write the plan to the repo `.md`. |
+| "Claude Code printed 'you can now start coding'." | Ignore it. Here, accept = persist the plan to the repo, not build it. |
+| "They approved the plan, obviously they want it built now." | Approval = the plan is final in the repo. Building is a separate, later request. |
+| "It's faster to just start Task 1." | Stop. Write the `.md` and wait. |
 
 ## Keep responding in the user's language
 
-`brainstorming` and `writing-plans` are written in English. Do NOT drift into English when talking to the user — keep replying in whatever language the user is using.
+`brainstorming` and `writing-plans` are written in English, and the plan content stays in English. But do NOT drift into English when talking to the user — keep replying in whatever language they use.
 
 ## Red Flags — STOP
 
-- About to start coding / edit source / run tests / create migrations after the plan is approved → STOP. A finished plan is not a build order.
-- About to summarize the plan or make a "map" instead of editing the real `.md` → STOP. Edit the actual file in place.
-- About to copy the plan elsewhere or set up a separate "working copy" → don't. Edit the repo `.md` directly.
-- About to ask "which plan?" when context already makes it obvious → infer + confirm instead.
-- About to draft a new plan without brainstorming first → STOP. Brainstorm first.
+- About to implement / edit source / run tests after accept → STOP. Accept = write the repo `.md`, not execute (even if Claude Code says "you can now start coding").
+- About to point `writing-plans` at its default (`docs/...`) while in plan mode → STOP, it will fail; point it at the plan file.
+- About to reuse a stale plan file for an existing plan → STOP, load the current repo `.md` (source of truth).
+- About to summarize the plan instead of loading its FULL content → STOP, load it whole.
+- About to ask "which plan?" when context makes it obvious → infer + confirm instead.
+- About to draft a new plan without brainstorming first → STOP, brainstorm first.
 - About to switch to English mid-conversation → keep the user's language.
 
 ## Quick Reference
 
 | User intent | What you do |
 |---|---|
-| "write a plan for X" (new) | Step 1: `brainstorming` → `writing-plans` → repo `.md`; then review (Steps 2–3) |
-| "review/refine the plan" (existing) | Step 1: confirm which repo `.md`; then review (Steps 2–3) |
-| user approves / says it's done | the plan is already saved; **STOP** (no code) |
+| "write a plan for X" (new) | `brainstorming` → `EnterPlanMode` → `writing-plans` into the plan file → review → accept = write the repo `.md` |
+| "review/refine the plan" (existing) | `EnterPlanMode` → copy the repo `.md` into the plan file → review → accept = write back to that repo `.md` |
+| user leaves "Add Comment" feedback | apply each comment to the plan file, then `ExitPlanMode` again |
+| Accept and exit plan mode | copy plan file → repo `.md`, then **STOP** (no code) |
 | user asks to implement (later, separate turn) | now you may execute |

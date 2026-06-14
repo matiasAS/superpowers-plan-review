@@ -1,7 +1,7 @@
 {
   "name": "superpowers-plan-review",
-  "description": "Write and review implementation plans interactively before any code: a `sps-plan` skill (author a plan via superpowers, then review it in place on the repo's .md) and a `sps-pal` skill (adversarial Red Team Consensus plan review via the PAL MCP).",
-  "version": "0.4.0",
+  "description": "Write and review implementation plans in plan mode before any code: a `sps-plan` skill (author via superpowers, review on the plan file with inline Add Comment, and on accept write the plan to the repo .md instead of implementing) and a `sps-pal` skill (adversarial Red Team Consensus plan review via the PAL MCP).",
+  "version": "0.5.0",
   "author": {
     "name": "Matias Alvarez Sabate"
   },
